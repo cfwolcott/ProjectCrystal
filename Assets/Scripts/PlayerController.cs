@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class PlayerController : MonoBehaviour 
@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     private float speedModifier;
     // The ships smoke trail particle emitter
     private ParticleSystem pe;
+	private int roll;
+	private float thrustVector;
 
     //-------------------------------------------------------------------------
     // Use this for initialization
@@ -26,6 +28,8 @@ public class PlayerController : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         pe = smokeTrail.GetComponent<ParticleSystem>();
+		roll = 0;
+		thrustVector = 0.0f;
     }
 
     //-------------------------------------------------------------------------
@@ -45,6 +49,7 @@ public class PlayerController : MonoBehaviour
     {
         float yaw = Input.GetAxisRaw("Horizontal");
         float thrust = Input.GetAxisRaw("Vertical");
+		int roll_max = (int)(-yaw * rigidBody.velocity.magnitude * 8.0f);
 
         // Show engine thrust only when thrusting forward
         //Debug.Log("thrust: " + thrust);
@@ -54,6 +59,9 @@ public class PlayerController : MonoBehaviour
 
             pe.maxParticles = 50;
             speedModifier = 1.0f;
+			engines.transform.Rotate (0.0f, 0.0f, -thrustVector);
+			thrustVector = yaw * 45.0f;
+			engines.transform.Rotate (0.0f, 0.0f, thrustVector);
         }
         else
         {
@@ -68,9 +76,13 @@ public class PlayerController : MonoBehaviour
         }
 
         // Apply turning as a rotation.
-        transform.Rotate(0, yaw * Time.deltaTime * rotationSpeed, rigidBody.velocity.y);
+		transform.Rotate(0, 0, (float)-roll);
+		transform.Rotate(0, yaw * Time.deltaTime * rotationSpeed, 0);//rigidBody.velocity.y * 10);
 
-        // Apply thrust as a force.
+		roll += (roll < roll_max) ? 1 : (roll > roll_max) ? -1 : 0;
+		transform.Rotate(0, 0, (float)roll);
+
+       // Apply thrust as a force.
         Vector3 force = transform.TransformDirection(0, 0, thrust * speed * speedModifier);
         rigidBody.AddForce(force);
 	}
