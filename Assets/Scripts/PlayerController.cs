@@ -39,7 +39,10 @@ public class PlayerController : MonoBehaviour
         {
             nextFire = Time.time + fireRate;
             //GameObject clone = 
-            Instantiate(shot, shotSpawn.position, shotSpawn.rotation); // as GameObject;
+			GameObject shotObject = (GameObject)Instantiate(shot, shotSpawn.position, shotSpawn.rotation); // as GameObject;
+
+			shotObject.GetComponent<Mover> ().SetParentSpeed (transform.GetComponent<Rigidbody> ().velocity);
+
             GetComponent<AudioSource>().Play();
         }
     }
