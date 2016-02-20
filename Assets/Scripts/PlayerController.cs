@@ -20,7 +20,6 @@ public class PlayerController : MonoBehaviour
     // The ships smoke trail particle emitter
     private ParticleSystem pe;
 	private int roll;
-	private float thrustVector;
 
     //-------------------------------------------------------------------------
     // Use this for initialization
@@ -29,7 +28,6 @@ public class PlayerController : MonoBehaviour
         rigidBody = GetComponent<Rigidbody>();
         pe = smokeTrail.GetComponent<ParticleSystem>();
 		roll = 0;
-		thrustVector = 0.0f;
     }
 
     //-------------------------------------------------------------------------
@@ -52,41 +50,55 @@ public class PlayerController : MonoBehaviour
     {
         float yaw = Input.GetAxisRaw("Horizontal");
         float thrust = Input.GetAxisRaw("Vertical");
-		int roll_max = (int)(-yaw * rigidBody.velocity.magnitude * 8.0f);
+		float thrustVector;
+		float thrustScale;
+		// max roll angle is a function of yaw and speed
+		int roll_max = (int)(-yaw * rigidBody.velocity.magnitude * 8);
 
-        // Show engine thrust only when thrusting forward
+        // Show engine thrust only when thrusting forward or turning
         //Debug.Log("thrust: " + thrust);
-        if (thrust > 0)
-        {
-            engines.SetActive(true);
+		engines.SetActive((thrust > 0) || (yaw != 0));
 
-            pe.maxParticles = 50;
-            speedModifier = 1.0f;
-			engines.transform.Rotate (0.0f, 0.0f, -thrustVector);
-			thrustVector = yaw * 45.0f;
-			engines.transform.Rotate (0.0f, 0.0f, thrustVector);
-        }
-        else
-        {
-            engines.SetActive(false);
+		if (thrust > 0) 
+		{
+			// thrusting...
+			// Turn on smoke
+			pe.maxParticles = 50;
+			// Turn off drag
+			speedModifier = 1.0f;
+			// Calculate flame angle and size
+			thrustVector = yaw * -45.0f;
+			thrustScale = thrust * 4.0f;
+		}
+		else 
+		{
+			// no thrust (or reverse thrust)...
+			// Reduce smoke until gone
+			if (pe.maxParticles > 0)
+				pe.maxParticles--;
+			// Apply drag
+			speedModifier = 0.25f;
+			// Flame (if any) will be pointed 90 deg left or right
+			thrustVector = (yaw > 0) ? -90 : 90;
+			// Calculate flame size based on yaw
+			thrustScale = 0.5f + ((yaw > 0) ? yaw : -yaw);
+		}
 
-            if (pe.maxParticles > 0)
-            {
-                pe.maxParticles -= 1;
-            }
+		// point and scale engine flames
+		engines.transform.localEulerAngles = new Vector3 (90, 90 + thrustVector, 0);
+		engines.transform.localScale = new Vector3 (thrustScale, thrustScale, 1);
 
-            speedModifier = 0.25f;
-        }
-
-        // Apply turning as a rotation.
+		// remove previous roll component
 		transform.Rotate(0, 0, (float)-roll);
-		transform.Rotate(0, yaw * Time.deltaTime * rotationSpeed, 0);//rigidBody.velocity.y * 10);
 
+		// Apply turning as a rotation.
+		transform.Rotate(0, yaw * Time.deltaTime * rotationSpeed, 0);
+
+		// Add in new roll component
 		roll += (roll < roll_max) ? 1 : (roll > roll_max) ? -1 : 0;
 		transform.Rotate(0, 0, (float)roll);
 
        // Apply thrust as a force.
-        Vector3 force = transform.TransformDirection(0, 0, thrust * speed * speedModifier);
-        rigidBody.AddForce(force);
+		rigidBody.AddForce(transform.TransformDirection(0, 0, thrust * speed * speedModifier));
 	}
 }
