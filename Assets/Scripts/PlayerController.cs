@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
 
     // Ship life parameters
     public GameObject explosion;
+	public GameObject spark;
     public float hitsToDestroy;
 
     // Cargo Pickups
@@ -173,23 +174,25 @@ public class PlayerController : MonoBehaviour
 
         if ((other.tag == "Bolt" || other.tag == "BoltEnemy") && other.tag != ourWeaponTag)
         {
-            Destroy(other.gameObject);
             hitsToDestroy--;
 
             gGameController.UI_SetSheildLevel(hitsToDestroy);
 
-            if (hitsToDestroy == 0)
-            {
-                if (explosion != null)
-                {
-                    Instantiate(explosion, transform.position, transform.rotation);
-                }
+			if (hitsToDestroy == 0) {
+				if (explosion != null) {
+					Instantiate (explosion, transform.position, transform.rotation);
+				}
 
-                Destroy(gameObject);
+				Destroy (gameObject);
 
-                gGameController.PlayerDead();
-            }
-        }
+				gGameController.PlayerDead ();
+			}
+			else if (spark != null)
+			{
+				Instantiate (spark, other.gameObject.transform.position, other.gameObject.transform.rotation);
+			}
+			Destroy(other.gameObject);
+       }
     }
 
     //-------------------------------------------------------------------------

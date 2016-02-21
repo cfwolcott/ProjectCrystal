@@ -196,7 +196,7 @@ public class GameController : MonoBehaviour
             float maxX = gGameSettings.PlayFieldSize_maxX - 20;
             float maxZ = gGameSettings.PlayFieldSize_maxZ - 20;
             Vector3 spawnPosition = new Vector3(Random.Range(-maxX, maxX), 0, Random.Range(-maxZ, maxZ));
-			
+
             Quaternion spawnRotation = Quaternion.identity;
 
             // Create the asteroid object

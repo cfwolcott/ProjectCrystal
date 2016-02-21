@@ -17,6 +17,7 @@ public class enemyAI : MonoBehaviour
 	public string ourWeaponTag;     // so our own shots don't destory us
 
 	public GameObject explosion;
+	public GameObject spark;
 	public float hitsToDestroy;
 
 
@@ -104,6 +105,10 @@ public class enemyAI : MonoBehaviour
 				}
 
 				Destroy(gameObject);
+			}
+			else if (spark != null)
+			{
+				Instantiate (spark, other.gameObject.transform.position, other.gameObject.transform.rotation);
 			}
 		}
 	}
