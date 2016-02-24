@@ -3,7 +3,7 @@ using System.Collections;
 
 public class enemyAI : MonoBehaviour 
 {
-    public Transform target; 
+    private Transform target; 
     public float moveSpeed;
     public float rotationSpeed;
     public float maxDetectRange = 20;
@@ -32,13 +32,16 @@ public class enemyAI : MonoBehaviour
     //-------------------------------------------------------------------------
     void Start()
     {
-		
+		target = null;
     }
 
     //-------------------------------------------------------------------------
     public void SetTarget(GameObject newTarget)
     {
-        target = newTarget.transform;
+		if (newTarget.CompareTag ("Player")) {
+			Debug.Log ("Player Detected");
+			target = newTarget.transform;
+		}
     }
 
     //-------------------------------------------------------------------------
