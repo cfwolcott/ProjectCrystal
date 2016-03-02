@@ -58,6 +58,7 @@
      <Compile Include="Assets\Scripts\RandomRotator.cs" />
      <Compile Include="Assets\Scripts\SensorDetector.cs" />
      <Compile Include="Assets\Scripts\enemyAI.cs" />
+     <Compile Include="Assets\Strobe.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

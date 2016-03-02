@@ -30,8 +30,7 @@ public class GameController : MonoBehaviour
     // Player
     public GameObject gPlayerObject;            // This is the player's ship object that was dragged in from the GUI
     private GameObject gPlayerObjectInstance;   // This is the object that will get passed around to all the enemy AI, camera, etc.
-    private int gCrystalCount = 0;
-
+ 
     // Asteroids
     public GameObject[] gAsteroidObjects;   // holds the different kinds of asteroid model objects (dragged in from the GUI). Not how many will actually be spawned
     public int gAsteroidCount = 10;
@@ -72,7 +71,7 @@ public class GameController : MonoBehaviour
     //-------------------------------------------------------------------------
     public void ResetGame()
     {
-        Application.LoadLevel(Application.loadedLevel);
+ 		UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
     }
 
     //-------------------------------------------------------------------------

@@ -45,7 +45,6 @@ public class PlayerController : MonoBehaviour
     // Main game controller
     private GameController gGameController;
 
-
 	private int eController = 0;
 	private Transform targetPlayer; 
 	private Transform targetCrystal; 
@@ -59,6 +58,8 @@ public class PlayerController : MonoBehaviour
 	private float AI_yaw = 0;
 	private float AI_thrust = 0;
 
+	private Light []lights;
+	private bool bLightsOn;
 
 	//-------------------------------------------------------------------------
 	void Awake()
@@ -108,6 +109,9 @@ public class PlayerController : MonoBehaviour
 			eController = 0;
 		targetPlayer = null;
 		targetCrystal = null;
+
+		lights = gameObject.GetComponentsInChildren<Light>();
+		SetLights (true);
     }
 
     //-------------------------------------------------------------------------
@@ -116,6 +120,7 @@ public class PlayerController : MonoBehaviour
 		bool bFire = false;
 		bool bFire2 = false;
 		bool bCargoDump = false;
+		bool bLights = false;
 
 		switch (eController) 
 		{
@@ -123,13 +128,14 @@ public class PlayerController : MonoBehaviour
 				bFire = Input.GetButton ("Fire1");
 				bFire2 = Input.GetButton ("Fire2");
 				bCargoDump = Input.GetKeyDown (KeyCode.C);
+				bLights = Input.GetKeyDown (KeyCode.L);
 				break;
 
 			case 1:
 				bFire = bAIFire;
 				bFire2 = bAIFire2;
 				bCargoDump = bAIDump;
-				bAIFire = bAIFire2 = bAIDump = false;
+				bAIFire = bAIFire2 = bAIDump = bLights = false;
 				break;
 		}
 
@@ -145,7 +151,7 @@ public class PlayerController : MonoBehaviour
         }
 
 		// Shoot out the mining laser
-        if (Input.GetButton("Fire2"))
+        if (bFire2)
         {
             Debug.Log("Fire2");
         }
@@ -156,6 +162,10 @@ public class PlayerController : MonoBehaviour
         {
             DumpCrystal(cargoDumpSpawn);
         }
+			
+		if (bLights) {
+			SetLights (!bLightsOn);
+		}
     }
 
     //-------------------------------------------------------------------------
@@ -321,6 +331,7 @@ public class PlayerController : MonoBehaviour
 		if (null != target)
 		{
 			Debug.DrawLine(target.position, myTransform.position, Color.red);
+			SetLights (true);
 
 			// Detect and Follow logic
 			Vector3 targetVector = target.position - myTransform.position;
@@ -340,6 +351,7 @@ public class PlayerController : MonoBehaviour
 				yaw = 1;
 			else if (yaw < -1)
 				yaw = -1;
+			AI_yaw = yaw;
 
 			thrust = distanceToTarget / 10;
 			if (bArmed && (thrust < 0.5f))
@@ -362,6 +374,7 @@ public class PlayerController : MonoBehaviour
 			//wander here
 			yaw = AI_yaw;
 			thrust = AI_thrust;
+			SetLights (false);
 		}
 	}
 
@@ -373,5 +386,12 @@ public class PlayerController : MonoBehaviour
 		else if (newTarget.CompareTag ("Crystal")){
 			targetCrystal = newTarget.transform;
 		}
+	}
+
+	private void SetLights(bool bEnable)
+	{
+		bLightsOn = bEnable;
+		foreach (Light lite in lights)
+			lite.enabled = bEnable;
 	}
 }
